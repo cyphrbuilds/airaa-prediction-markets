@@ -13,11 +13,9 @@ import { useNewsCard } from '@/hooks/useNewsCard';
 interface NewsCardProps {
   newsItem: NewsItem;
   onMarketsClick: () => void;
-  currentIndex: number;
-  totalItems: number;
 }
 
-export default function NewsCard({ newsItem, onMarketsClick, currentIndex, totalItems }: NewsCardProps) {
+export default function NewsCard({ newsItem, onMarketsClick }: NewsCardProps) {
   const { marketCountText } = useNewsCard({ newsItem });
 
   return (

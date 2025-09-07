@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
-import { mockNewsData, categories, NewsItem } from '@/data/mockData';
+import { mockNewsData } from '@/data/mockData';
 import NewsCard from '@/components/NewsCard';
 import MarketsPanel from '@/components/MarketsPanel';
 import CategoryFilter from '@/components/CategoryFilter';
@@ -15,7 +15,6 @@ export default function Home() {
   const [isMarketsOpen, setIsMarketsOpen] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(true);
   const [swipeDirection, setSwipeDirection] = useState<'up' | 'down' | 'left' | 'right' | undefined>();
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobile, setIsMobile] = useState(false);
   const lastSwipeTime = useRef(0);
@@ -52,7 +51,7 @@ export default function Home() {
     setTimeout(() => setSwipeDirection(undefined), 300);
   }, [filteredNews.length]);
 
-  const handlePanEnd = useCallback((event: any, info: PanInfo) => {
+  const handlePanEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const threshold = 50;
     const { offset, velocity } = info;
 
@@ -80,12 +79,6 @@ export default function Home() {
     setShowSwipeHint(true); // Show hint again when changing categories
   }, []);
 
-  const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    // Simulate refresh delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsRefreshing(false);
-  }, []);
 
   const handleMarketsClick = useCallback(() => {
     setIsMarketsOpen(true);
@@ -186,8 +179,6 @@ export default function Home() {
               key={`${selectedCategory}-${currentIndex}`}
               newsItem={currentNews}
               onMarketsClick={handleMarketsClick}
-              currentIndex={currentIndex}
-              totalItems={filteredNews.length}
             />
           </AnimatePresence>
         </motion.div>
@@ -206,24 +197,6 @@ export default function Home() {
         direction={swipeDirection}
       />
 
-      {/* Pull to Refresh Indicator */}
-      {isRefreshing && (
-        <motion.div
-          className="fixed top-20 left-1/2 transform -translate-x-1/2 z-30"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm flex items-center space-x-2">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            >
-              ↻
-            </motion.div>
-            <span>Refreshing...</span>
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 }

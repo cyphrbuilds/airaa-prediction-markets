@@ -1,12 +1,10 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { PredictionEvent } from '@/data/mockData';
-import { X, TrendingUp, ExternalLink } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 
 interface MarketsPanelProps {
   isOpen: boolean;
