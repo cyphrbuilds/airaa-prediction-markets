@@ -4,9 +4,11 @@ import { motion } from 'framer-motion';
 import { NewsItem } from '@/data/mockData';
 import { Share2, Bookmark, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import ProgressIndicator from './ProgressIndicator';
+import SentimentBadge from '@/components/ui/SentimentBadge';
+import ImpactBadge from '@/components/ui/ImpactBadge';
+import { COMMON_CLASSES } from '@/lib/constants';
+import { useNewsCard } from '@/hooks/useNewsCard';
 
 interface NewsCardProps {
   newsItem: NewsItem;
@@ -16,6 +18,8 @@ interface NewsCardProps {
 }
 
 export default function NewsCard({ newsItem, onMarketsClick, currentIndex, totalItems }: NewsCardProps) {
+  const { marketCountText } = useNewsCard({ newsItem });
+
   return (
     <motion.div
       className="relative w-full h-screen bg-background flex flex-col"
@@ -34,19 +38,25 @@ export default function NewsCard({ newsItem, onMarketsClick, currentIndex, total
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
         
         {/* Category Badge at Bottom Left of Image */}
-        <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4">
-          <Badge variant="secondary" className="text-xs bg-white/90 text-gray-900">
+        <div className={COMMON_CLASSES.positioning.bottomLeft}>
+          <Badge variant="secondary" className={`${COMMON_CLASSES.badge} bg-white/90 text-gray-900`}>
             {newsItem.category}
           </Badge>
         </div>
         
+        {/* Sentiment and Impact Tags at Top Right of Image */}
+        <div className={`${COMMON_CLASSES.positioning.topRight} flex flex-col ${COMMON_CLASSES.spacing.vertical}`}>
+          <SentimentBadge sentiment={newsItem.sentiment} />
+          <ImpactBadge impact={newsItem.impact} />
+        </div>
+        
         {/* Save and Share Icons at Bottom Right of Image */}
-        <div className="absolute bottom-2 sm:bottom-4 right-2 sm:right-4 flex items-center space-x-1 sm:space-x-2">
-          <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-8 sm:w-8 bg-white/90 hover:bg-white text-gray-900">
-            <Bookmark size={14} className="sm:w-4 sm:h-4" />
+        <div className={`${COMMON_CLASSES.positioning.bottomRight} flex items-center ${COMMON_CLASSES.spacing.small}`}>
+          <Button variant="ghost" size="icon" className={COMMON_CLASSES.iconButton}>
+            <Bookmark size={14} className={COMMON_CLASSES.iconSize} />
           </Button>
-          <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-8 sm:w-8 bg-white/90 hover:bg-white text-gray-900">
-            <Share2 size={14} className="sm:w-4 sm:h-4" />
+          <Button variant="ghost" size="icon" className={COMMON_CLASSES.iconButton}>
+            <Share2 size={14} className={COMMON_CLASSES.iconSize} />
           </Button>
         </div>
       </div>
@@ -79,7 +89,7 @@ export default function NewsCard({ newsItem, onMarketsClick, currentIndex, total
           size="lg"
         >
           <TrendingUp size={18} className="sm:w-5 sm:h-5" />
-          <span>Show Markets ({newsItem.events.reduce((total, event) => total + event.markets.length, 0)})</span>
+          <span>{marketCountText}</span>
         </Button>
       </div>
     </motion.div>

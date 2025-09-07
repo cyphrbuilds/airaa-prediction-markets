@@ -1,3 +1,23 @@
+export enum Sentiment {
+  BULLISH = 'Bullish',
+  BEARISH = 'Bearish'
+}
+
+export enum Impact {
+  HIGH = 'High Impact',
+  MEDIUM = 'Medium Impact',
+  LOW = 'Low Impact'
+}
+
+// Type guards for better type safety
+export const isSentiment = (value: string): value is Sentiment => {
+  return Object.values(Sentiment).includes(value as Sentiment);
+};
+
+export const isImpact = (value: string): value is Impact => {
+  return Object.values(Impact).includes(value as Impact);
+};
+
 export interface NewsItem {
   id: string;
   headline: string;
@@ -7,6 +27,8 @@ export interface NewsItem {
   thumbnail: string;
   category: string;
   eventLogo?: string;
+  sentiment: Sentiment;
+  impact: Impact;
   events: PredictionEvent[];
 }
 
@@ -47,6 +69,8 @@ export const mockNewsData: NewsItem[] = [
     thumbnail: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&h=600&fit=crop&q=80',
     category: 'Technology',
     eventLogo: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=100&h=100&fit=crop&q=80',
+    sentiment: Sentiment.BULLISH,
+    impact: Impact.HIGH,
     events: [
       {
         id: 'event_1',
@@ -102,6 +126,8 @@ export const mockNewsData: NewsItem[] = [
     time: '4 hours ago',
     thumbnail: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=600&fit=crop&q=80',
     category: 'Business',
+    sentiment: Sentiment.BULLISH,
+    impact: Impact.HIGH,
     events: [
       {
         id: 'event_3',
@@ -133,6 +159,8 @@ export const mockNewsData: NewsItem[] = [
     summary: 'Researchers develop advanced AI system capable of complex problem-solving, raising questions about artificial general intelligence timeline.',
     source: 'MIT Technology Review',
     time: '6 hours ago',
+    sentiment: Sentiment.BULLISH,
+    impact: Impact.HIGH,
     thumbnail: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop&q=80',
     category: 'Technology',
     events: [
@@ -168,6 +196,8 @@ export const mockNewsData: NewsItem[] = [
     time: '8 hours ago',
     thumbnail: 'https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=800&h=600&fit=crop&q=80',
     category: 'Politics',
+    sentiment: Sentiment.BULLISH,
+    impact: Impact.HIGH,
     events: [
       {
         id: 'event_5',
@@ -199,6 +229,8 @@ export const mockNewsData: NewsItem[] = [
     summary: 'Elon Musk\'s company achieves major milestone in interplanetary travel with successful test of next-generation spacecraft technology.',
     source: 'Space.com',
     time: '12 hours ago',
+    sentiment: Sentiment.BULLISH,
+    impact: Impact.MEDIUM,
     thumbnail: 'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&h=600&fit=crop&q=80',
     category: 'Science',
     events: [
@@ -234,6 +266,8 @@ export const mockNewsData: NewsItem[] = [
     time: '1 day ago',
     thumbnail: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=800&h=600&fit=crop&q=80',
     category: 'Entertainment',
+    sentiment: Sentiment.BULLISH,
+    impact: Impact.MEDIUM,
     events: [
       {
         id: 'event_7',
@@ -267,6 +301,8 @@ export const mockNewsData: NewsItem[] = [
     time: '3 hours ago',
     thumbnail: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=600&fit=crop&q=80',
     category: 'Technology',
+    sentiment: Sentiment.BULLISH,
+    impact: Impact.HIGH,
     events: [
       {
         id: 'event_8',
@@ -300,6 +336,8 @@ export const mockNewsData: NewsItem[] = [
     time: '5 hours ago',
     thumbnail: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&h=600&fit=crop&q=80',
     category: 'Sports',
+    sentiment: Sentiment.BULLISH,
+    impact: Impact.MEDIUM,
     events: [
       {
         id: 'event_9',
@@ -333,6 +371,8 @@ export const mockNewsData: NewsItem[] = [
     time: '7 hours ago',
     thumbnail: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=600&fit=crop&q=80',
     category: 'Science',
+    sentiment: Sentiment.BULLISH,
+    impact: Impact.HIGH,
     events: [
       {
         id: 'event_10',
@@ -366,6 +406,8 @@ export const mockNewsData: NewsItem[] = [
     time: '9 hours ago',
     thumbnail: 'https://images.unsplash.com/photo-1584515933487-779824d29309?w=800&h=600&fit=crop&q=80',
     category: 'Health',
+    sentiment: Sentiment.BULLISH,
+    impact: Impact.HIGH,
     events: [
       {
         id: 'event_11',
@@ -399,6 +441,8 @@ export const mockNewsData: NewsItem[] = [
     time: '11 hours ago',
     thumbnail: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=800&h=600&fit=crop&q=80',
     category: 'Science',
+    sentiment: Sentiment.BULLISH,
+    impact: Impact.HIGH,
     events: [
       {
         id: 'event_12',
@@ -432,6 +476,8 @@ export const mockNewsData: NewsItem[] = [
     time: '13 hours ago',
     thumbnail: 'https://images.unsplash.com/photo-1592478411213-6153e4ebc696?w=800&h=600&fit=crop&q=80',
     category: 'Entertainment',
+    sentiment: Sentiment.BULLISH,
+    impact: Impact.MEDIUM,
     events: [
       {
         id: 'event_13',

@@ -52,7 +52,7 @@ export default function Home() {
     setTimeout(() => setSwipeDirection(undefined), 300);
   }, [filteredNews.length]);
 
-  const handlePanEnd = useCallback((event: unknown, info: PanInfo) => {
+  const handlePanEnd = useCallback((event: any, info: PanInfo) => {
     const threshold = 50;
     const { offset, velocity } = info;
 

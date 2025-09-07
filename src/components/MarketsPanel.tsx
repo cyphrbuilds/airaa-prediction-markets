@@ -89,8 +89,8 @@ export default function MarketsPanel({ isOpen, onClose, events }: MarketsPanelPr
               </div>
               
               {/* Event Footer */}
-              <div className="mt-2 pt-2 border-t border-gray-200">
-                <div className="flex justify-between items-center text-xs text-gray-600">
+              <div className="mt-2">
+                <div className="flex justify-between items-center text-xs text-gray-600 pb-2 border-b border-gray-200">
                   <span>Total Volume</span>
                   <span className="font-semibold">{event.totalVolume}</span>
                 </div>
