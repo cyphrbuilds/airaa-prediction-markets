@@ -50,7 +50,7 @@ export default function Home() {
         setCurrentIndex(currentIndex - 1);
       }
     } else if (direction === 'left') {
-      // Next category
+      // Swipe left = move to next category (tabs move right)
       const currentCategoryIndex = categories.indexOf(selectedCategory);
       if (currentCategoryIndex < categories.length - 1) {
         const nextCategory = categories[currentCategoryIndex + 1];
@@ -58,7 +58,7 @@ export default function Home() {
         setCurrentIndex(0);
       }
     } else if (direction === 'right') {
-      // Previous category
+      // Swipe right = move to previous category (tabs move left)
       const currentCategoryIndex = categories.indexOf(selectedCategory);
       if (currentCategoryIndex > 0) {
         const prevCategory = categories[currentCategoryIndex - 1];
@@ -86,9 +86,9 @@ export default function Home() {
     } else {
       // Horizontal swipe
       if (offset.x > threshold || velocity.x > 500) {
-        handleSwipe('left');
+        handleSwipe('right'); // Swipe right = move to previous category
       } else if (offset.x < -threshold || velocity.x < -500) {
-        handleSwipe('right');
+        handleSwipe('left'); // Swipe left = move to next category
       }
     }
   }, [handleSwipe]);
