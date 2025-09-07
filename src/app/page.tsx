@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
-import { mockNewsData } from '@/data/mockData';
+import { mockNewsData, categories } from '@/data/mockData';
 import NewsCard from '@/components/NewsCard';
 import MarketsPanel from '@/components/MarketsPanel';
 import CategoryFilter from '@/components/CategoryFilter';
@@ -39,17 +39,37 @@ export default function Home() {
     setSwipeDirection(direction);
     setShowSwipeHint(false);
 
-    if (direction === 'up' || direction === 'right') {
+    if (direction === 'up') {
       // Next story
-      setCurrentIndex((prev) => (prev + 1) % filteredNews.length);
-    } else if (direction === 'down' || direction === 'left') {
+      if (currentIndex < filteredNews.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+      }
+    } else if (direction === 'down') {
       // Previous story
-      setCurrentIndex((prev) => (prev - 1 + filteredNews.length) % filteredNews.length);
+      if (currentIndex > 0) {
+        setCurrentIndex(currentIndex - 1);
+      }
+    } else if (direction === 'left') {
+      // Next category
+      const currentCategoryIndex = categories.indexOf(selectedCategory);
+      if (currentCategoryIndex < categories.length - 1) {
+        const nextCategory = categories[currentCategoryIndex + 1];
+        setSelectedCategory(nextCategory);
+        setCurrentIndex(0);
+      }
+    } else if (direction === 'right') {
+      // Previous category
+      const currentCategoryIndex = categories.indexOf(selectedCategory);
+      if (currentCategoryIndex > 0) {
+        const prevCategory = categories[currentCategoryIndex - 1];
+        setSelectedCategory(prevCategory);
+        setCurrentIndex(0);
+      }
     }
 
     // Reset swipe direction after animation
     setTimeout(() => setSwipeDirection(undefined), 300);
-  }, [filteredNews.length]);
+  }, [currentIndex, filteredNews.length, selectedCategory]);
 
   const handlePanEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const threshold = 50;
@@ -167,8 +187,8 @@ export default function Home() {
       {/* News Card Container */}
       <div className="relative">
         <motion.div
-          drag="y"
-          dragConstraints={{ top: 0, bottom: 0 }}
+          drag
+          dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
           dragElastic={0.2}
           onPanEnd={handlePanEnd}
           className="w-full"

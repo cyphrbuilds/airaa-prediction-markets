@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { NewsItem } from '@/data/mockData';
 import { Share2, Bookmark, TrendingUp } from 'lucide-react';
@@ -9,6 +10,8 @@ import SentimentBadge from '@/components/ui/SentimentBadge';
 import ImpactBadge from '@/components/ui/ImpactBadge';
 import { COMMON_CLASSES } from '@/lib/constants';
 import { useNewsCard } from '@/hooks/useNewsCard';
+import { addBookmark, removeBookmark, isBookmarked } from '@/lib/bookmarks';
+import { shareArticle } from '@/lib/share';
 
 interface NewsCardProps {
   newsItem: NewsItem;
@@ -17,6 +20,45 @@ interface NewsCardProps {
 
 export default function NewsCard({ newsItem, onMarketsClick }: NewsCardProps) {
   const { marketCountText } = useNewsCard({ newsItem });
+  const [bookmarked, setBookmarked] = useState(isBookmarked(newsItem.id));
+  const [showBookmarkFeedback, setShowBookmarkFeedback] = useState(false);
+  const lastTapRef = useRef<number>(0);
+
+  const handleDoubleTap = () => {
+    const now = Date.now();
+    const timeSinceLastTap = now - lastTapRef.current;
+    
+    if (timeSinceLastTap < 300) { // 300ms double-tap threshold
+      toggleBookmark();
+    }
+    lastTapRef.current = now;
+  };
+
+  const toggleBookmark = () => {
+    if (bookmarked) {
+      removeBookmark(newsItem.id);
+      setBookmarked(false);
+    } else {
+      addBookmark(newsItem.id, newsItem.headline);
+      setBookmarked(true);
+      setShowBookmarkFeedback(true);
+      setTimeout(() => setShowBookmarkFeedback(false), 2000);
+    }
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: newsItem.headline,
+      text: newsItem.summary,
+      url: window.location.href
+    };
+    
+    const success = await shareArticle(shareData);
+    if (success) {
+      // Could add a toast notification here
+      console.log('Article shared successfully');
+    }
+  };
 
   return (
     <motion.div
@@ -25,6 +67,7 @@ export default function NewsCard({ newsItem, onMarketsClick }: NewsCardProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -50 }}
       transition={{ duration: 0.3 }}
+      onTap={handleDoubleTap}
     >
       {/* Full-Width Image - Takes space up to filter bar */}
       <div className="relative w-full h-64 sm:h-80 overflow-hidden">
@@ -50,13 +93,40 @@ export default function NewsCard({ newsItem, onMarketsClick }: NewsCardProps) {
         
         {/* Save and Share Icons at Bottom Right of Image */}
         <div className={`${COMMON_CLASSES.positioning.bottomRight} flex items-center ${COMMON_CLASSES.spacing.small}`}>
-          <Button variant="ghost" size="icon" className={COMMON_CLASSES.iconButton}>
-            <Bookmark size={14} className={COMMON_CLASSES.iconSize} />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className={`${COMMON_CLASSES.iconButton} ${bookmarked ? 'text-yellow-500' : ''}`}
+            onClick={toggleBookmark}
+          >
+            <Bookmark 
+              size={14} 
+              className={`${COMMON_CLASSES.iconSize} ${bookmarked ? 'fill-current' : ''}`} 
+            />
           </Button>
-          <Button variant="ghost" size="icon" className={COMMON_CLASSES.iconButton}>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className={COMMON_CLASSES.iconButton}
+            onClick={handleShare}
+          >
             <Share2 size={14} className={COMMON_CLASSES.iconSize} />
           </Button>
         </div>
+
+        {/* Bookmark Feedback */}
+        {showBookmarkFeedback && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          >
+            <div className="bg-black/80 text-white px-4 py-2 rounded-full text-sm font-medium">
+              Bookmarked! 📌
+            </div>
+          </motion.div>
+        )}
       </div>
 
       {/* Main Content */}

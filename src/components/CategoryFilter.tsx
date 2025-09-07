@@ -1,10 +1,11 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { categories } from '@/data/mockData';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import Logo from './Logo';
 
 interface CategoryFilterProps {
@@ -14,6 +15,23 @@ interface CategoryFilterProps {
 }
 
 export default function CategoryFilter({ selectedCategory, onCategoryChange, onSearch }: CategoryFilterProps) {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearchToggle = () => {
+    setIsSearchOpen(!isSearchOpen);
+    if (isSearchOpen) {
+      setSearchQuery('');
+      onSearch('');
+    }
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    onSearch(query);
+  };
+
   return (
     <div className="w-full bg-background border-b border-border sticky top-0 z-30 backdrop-blur-sm bg-background/95">
       <div className="px-4 py-3">
@@ -24,12 +42,35 @@ export default function CategoryFilter({ selectedCategory, onCategoryChange, onS
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => onSearch('')}
+            onClick={handleSearchToggle}
             className="h-8 w-8 rounded-full hover:bg-accent"
           >
-            <Search className="h-4 w-4" />
+            {isSearchOpen ? <X className="h-4 w-4" /> : <Search className="h-4 w-4" />}
           </Button>
         </div>
+        
+        <AnimatePresence>
+          {isSearchOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-3"
+            >
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search news and markets..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  className="w-full px-4 py-2 pl-10 pr-4 bg-secondary border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  autoFocus
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <div className="flex space-x-2 overflow-x-auto scrollbar-hide pb-1">
           {categories.map((category) => (
             <motion.div
