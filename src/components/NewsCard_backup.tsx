@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { NewsItem } from '@/data/mockData';
 import { TrendingUp, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,6 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
   const [currentMarketIndex, setCurrentMarketIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isInteractingWithMarkets = useRef(false);
-  const [isDragging, setIsDragging] = useState(false);
 
   // Handle scroll events to update current market index
   useEffect(() => {
@@ -40,7 +39,7 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
     const handleTouchStart = (e: TouchEvent) => {
       if (hasMultipleMarkets) {
         // Don't prevent default - let the browser handle scrolling
-        e.stopPropagation();
+        // e.stopPropagation(); // Removed to allow native mobile scrolling
         isInteractingWithMarkets.current = true;
         onMarketInteraction?.(true);
       }
@@ -57,7 +56,7 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
 
     const handleTouchEnd = (e: TouchEvent) => {
       if (hasMultipleMarkets) {
-        e.stopPropagation();
+        // e.stopPropagation(); // Removed to allow native mobile scrolling
         // Reset after a short delay to allow for any pending events
         setTimeout(() => {
           isInteractingWithMarkets.current = false;
@@ -69,7 +68,7 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
     // Mouse events for desktop/tablet - only prevent bubbling if there are multiple markets
     const handleMouseDown = (e: MouseEvent) => {
       if (hasMultipleMarkets) {
-        e.stopPropagation();
+        // e.stopPropagation(); // Removed to allow native mobile scrolling
         isInteractingWithMarkets.current = true;
         onMarketInteraction?.(true);
       }
@@ -77,7 +76,7 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
 
     const handleMouseUp = (e: MouseEvent) => {
       if (hasMultipleMarkets) {
-        e.stopPropagation();
+        // e.stopPropagation(); // Removed to allow native mobile scrolling
         setTimeout(() => {
           isInteractingWithMarkets.current = false;
           onMarketInteraction?.(false);
@@ -111,46 +110,6 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
       container.removeEventListener('wheel', handleWheel);
     };
   }, [marketEvents.length]);
-
-  // Handle market card swipe animations
-  const handleMarketCardPan = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const { offset, velocity } = info;
-    const threshold = 50;
-    
-    // Only handle horizontal swipes
-    if (Math.abs(offset.x) > Math.abs(offset.y)) {
-      if (Math.abs(offset.x) > threshold || Math.abs(velocity.x) > 500) {
-        // Determine swipe direction
-        if (offset.x > 0) {
-          // Swipe right - go to previous market
-          if (currentMarketIndex > 0) {
-            setCurrentMarketIndex(currentMarketIndex - 1);
-            // Scroll to previous card
-            if (scrollContainerRef.current) {
-              const containerWidth = scrollContainerRef.current.clientWidth;
-              scrollContainerRef.current.scrollTo({
-                left: (currentMarketIndex - 1) * containerWidth,
-                behavior: 'smooth'
-              });
-            }
-          }
-        } else {
-          // Swipe left - go to next market
-          if (currentMarketIndex < marketEvents.length - 1) {
-            setCurrentMarketIndex(currentMarketIndex + 1);
-            // Scroll to next card
-            if (scrollContainerRef.current) {
-              const containerWidth = scrollContainerRef.current.clientWidth;
-              scrollContainerRef.current.scrollTo({
-                left: (currentMarketIndex + 1) * containerWidth,
-                behavior: 'smooth'
-              });
-            }
-          }
-        }
-      }
-    }
-  };
 
   return (
     <motion.div
@@ -234,33 +193,9 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
             <div className="flex gap-2 px-3 pb-3">
               {/* Market Cards */}
               {marketEvents.map((event, index) => (
-                <motion.div
+                <div
                   key={event.id}
                   className="market-card flex-shrink-0 px-3 py-3.5 gradient-card rounded-[10px] border border-border flex flex-col justify-start items-start gap-3.5 scroll-snap-align-start"
-                  initial={{ opacity: 0, x: index === 0 ? 0 : 50 }}
-                  animate={{ 
-                    opacity: 1, 
-                    x: 0,
-                    scale: currentMarketIndex === index ? 1 : 0.95
-                  }}
-                  transition={{ 
-                    duration: 0.3,
-                    ease: "easeOut"
-                  }}
-                  drag="x"
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.2}
-                  onPan={handleMarketCardPan}
-                  onDragStart={() => setIsDragging(true)}
-                  onDragEnd={() => setIsDragging(false)}
-                  whileDrag={{ 
-                    scale: 1.02,
-                    rotate: currentMarketIndex === index ? 0 : 2
-                  }}
-                  whileHover={{ 
-                    scale: 1.01,
-                    transition: { duration: 0.2 }
-                  }}
                 >
                   {/* Volume and Expiry */}
                   <div className="w-full flex justify-between items-center">
@@ -315,7 +250,7 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
                       </div>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
