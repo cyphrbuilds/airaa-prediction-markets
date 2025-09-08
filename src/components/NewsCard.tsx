@@ -10,9 +10,10 @@ import { Badge } from '@/components/ui/badge';
 interface NewsCardProps {
   newsItem: NewsItem;
   onMarketInteraction?: (isInteracting: boolean) => void;
+  swipeDirection?: 'up' | 'down' | 'left' | 'right';
 }
 
-export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProps) {
+export default function NewsCard({ newsItem, onMarketInteraction, swipeDirection }: NewsCardProps) {
   const marketEvents = newsItem.events.slice(0, 2); // Max 2 events
   const [currentMarketIndex, setCurrentMarketIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -152,13 +153,48 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
     }
   };
 
+  // Define directional animations based on swipe direction
+  const getInitialAnimation = () => {
+    if (!swipeDirection) return { opacity: 0, y: 50 };
+    
+    switch (swipeDirection) {
+      case 'up':
+        return { opacity: 0, y: 100 };
+      case 'down':
+        return { opacity: 0, y: -100 };
+      case 'left':
+        return { opacity: 0, x: 100 };
+      case 'right':
+        return { opacity: 0, x: -100 };
+      default:
+        return { opacity: 0, y: 50 };
+    }
+  };
+
+  const getExitAnimation = () => {
+    if (!swipeDirection) return { opacity: 0, y: -50 };
+    
+    switch (swipeDirection) {
+      case 'up':
+        return { opacity: 0, y: -100 };
+      case 'down':
+        return { opacity: 0, y: 100 };
+      case 'left':
+        return { opacity: 0, x: -100 };
+      case 'right':
+        return { opacity: 0, x: 100 };
+      default:
+        return { opacity: 0, y: -50 };
+    }
+  };
+
   return (
     <motion.div
       className="w-full h-full px-4 pt-2 pb-4 flex flex-col justify-start items-start gap-4"
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
-      transition={{ duration: 0.3 }}
+      initial={getInitialAnimation()}
+      animate={{ opacity: 1, x: 0, y: 0 }}
+      exit={getExitAnimation()}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
     >
       {/* Main News Card */}
       <div className="w-full flex-1 bg-surface rounded-xl border border-border flex flex-col justify-start items-start overflow-hidden card-hover">

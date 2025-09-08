@@ -174,6 +174,7 @@ export default function Home() {
                 key={`${selectedCategory}-${currentIndex}`}
                 newsItem={currentNews}
                 onMarketInteraction={handleMarketInteraction}
+                swipeDirection={swipeDirection}
               />
             )}
           </AnimatePresence>
