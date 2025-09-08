@@ -39,7 +39,7 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
     const handleTouchStart = (e: TouchEvent) => {
       if (hasMultipleMarkets) {
         // Don't prevent default - let the browser handle scrolling
-        e.stopPropagation();
+        // e.stopPropagation(); // Removed to allow native mobile scrolling
         isInteractingWithMarkets.current = true;
         onMarketInteraction?.(true);
       }
@@ -48,7 +48,7 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
     const handleTouchMove = (e: TouchEvent) => {
       if (hasMultipleMarkets) {
         // Don't prevent default - let the browser handle scrolling
-        e.stopPropagation();
+        // e.stopPropagation(); // Removed to allow native mobile scrolling
         isInteractingWithMarkets.current = true;
         onMarketInteraction?.(true);
       }
@@ -56,7 +56,7 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
 
     const handleTouchEnd = (e: TouchEvent) => {
       if (hasMultipleMarkets) {
-        e.stopPropagation();
+        // e.stopPropagation(); // Removed to allow native mobile scrolling
         // Reset after a short delay to allow for any pending events
         setTimeout(() => {
           isInteractingWithMarkets.current = false;
@@ -68,7 +68,7 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
     // Mouse events for desktop/tablet - only prevent bubbling if there are multiple markets
     const handleMouseDown = (e: MouseEvent) => {
       if (hasMultipleMarkets) {
-        e.stopPropagation();
+        // e.stopPropagation(); // Removed to allow native mobile scrolling
         isInteractingWithMarkets.current = true;
         onMarketInteraction?.(true);
       }
@@ -76,7 +76,7 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
 
     const handleMouseUp = (e: MouseEvent) => {
       if (hasMultipleMarkets) {
-        e.stopPropagation();
+        // e.stopPropagation(); // Removed to allow native mobile scrolling
         setTimeout(() => {
           isInteractingWithMarkets.current = false;
           onMarketInteraction?.(false);
