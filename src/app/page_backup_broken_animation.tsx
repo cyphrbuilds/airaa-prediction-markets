@@ -17,7 +17,11 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobile, setIsMobile] = useState(false);
   const [isInteractingWithMarkets, setIsInteractingWithMarkets] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const lastSwipeTime = useRef(0);
+
+  // Animation data - this doesn't change until animation completes
+  const [animationIndex, setAnimationIndex] = useState(0);
 
   // Filter news based on selected category and search query
   const filteredNews = mockNewsData.filter(item => {
@@ -28,42 +32,72 @@ export default function Home() {
     return matchesCategory && matchesSearch;
   });
 
-  const currentNews = filteredNews[currentIndex];
+  // Use animationIndex for card data during transitions
+  const currentNews = filteredNews[animationIndex];
+  
+  // Get next and previous cards for stacking
+  const getNextIndex = (index: number) => index < filteredNews.length - 1 ? index + 1 : 0;
+  const getPrevIndex = (index: number) => index > 0 ? index - 1 : filteredNews.length - 1;
+  
+  const nextNews = filteredNews[getNextIndex(animationIndex)];
+  const prevNews = filteredNews[getPrevIndex(animationIndex)];
 
   const handleSwipe = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
     const now = Date.now();
-    if (now - lastSwipeTime.current < 300) return; // Prevent rapid swipes
+    if (now - lastSwipeTime.current < 300 || isTransitioning) return; // Prevent rapid swipes
     lastSwipeTime.current = now;
 
+    setIsTransitioning(true);
     setSwipeDirection(direction);
 
     if (direction === 'up') {
       // Next story - infinite scroll
       const nextIndex = currentIndex < filteredNews.length - 1 ? currentIndex + 1 : 0;
+      // Update the actual index immediately for data
       setCurrentIndex(nextIndex);
+      // Update animation index after animation completes
+      setTimeout(() => {
+        setAnimationIndex(nextIndex);
+        setIsTransitioning(false);
+        setSwipeDirection(undefined);
+      }, 400);
     } else if (direction === 'down') {
       // Previous story - infinite scroll
       const prevIndex = currentIndex > 0 ? currentIndex - 1 : filteredNews.length - 1;
+      // Update the actual index immediately for data
       setCurrentIndex(prevIndex);
+      // Update animation index after animation completes
+      setTimeout(() => {
+        setAnimationIndex(prevIndex);
+        setIsTransitioning(false);
+        setSwipeDirection(undefined);
+      }, 400);
     } else if (direction === 'left') {
       // Swipe left = move to next category (tabs move right) - infinite scroll
       const currentCategoryIndex = categories.indexOf(selectedCategory);
       const nextIndex = currentCategoryIndex < categories.length - 1 ? currentCategoryIndex + 1 : 0;
       const nextCategory = categories[nextIndex];
-      setSelectedCategory(nextCategory);
-      setCurrentIndex(0);
+      setTimeout(() => {
+        setSelectedCategory(nextCategory);
+        setCurrentIndex(0);
+        setAnimationIndex(0);
+        setIsTransitioning(false);
+        setSwipeDirection(undefined);
+      }, 400);
     } else if (direction === 'right') {
       // Swipe right = move to previous category (tabs move left) - infinite scroll
       const currentCategoryIndex = categories.indexOf(selectedCategory);
       const prevIndex = currentCategoryIndex > 0 ? currentCategoryIndex - 1 : categories.length - 1;
       const prevCategory = categories[prevIndex];
-      setSelectedCategory(prevCategory);
-      setCurrentIndex(0);
+      setTimeout(() => {
+        setSelectedCategory(prevCategory);
+        setCurrentIndex(0);
+        setAnimationIndex(0);
+        setIsTransitioning(false);
+        setSwipeDirection(undefined);
+      }, 400);
     }
-
-    // Reset swipe direction after animation
-    setTimeout(() => setSwipeDirection(undefined), 300);
-  }, [currentIndex, filteredNews.length, selectedCategory]);
+  }, [currentIndex, filteredNews.length, selectedCategory, isTransitioning]);
 
   const handlePanEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const threshold = 50;
@@ -100,12 +134,15 @@ export default function Home() {
   const handleCategoryChange = useCallback((category: string) => {
     setSelectedCategory(category);
     setCurrentIndex(0); // Reset to first item when changing category
+    setAnimationIndex(0); // Reset animation index too
   }, []);
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
     setCurrentIndex(0); // Reset to first item when searching
+    setAnimationIndex(0); // Reset animation index too
   }, []);
+
 
   const handleMarketsClose = useCallback(() => {
     setIsMarketsOpen(false);
@@ -126,6 +163,7 @@ export default function Home() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+
   // Show desktop warning on desktop
   if (!isMobile) {
     return <DesktopWarning />;
@@ -143,28 +181,75 @@ export default function Home() {
         onSearch={handleSearch}
       />
 
-      {/* Simple News Card Container */}
+      {/* Stacked News Cards Container */}
       <div className="relative flex-1 overflow-hidden">
-        <motion.div
-          drag
-          dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
-          dragElastic={0.2}
-          onPanEnd={handlePanEnd}
-          className="w-full h-full flex flex-col"
-          whileDrag={{ scale: 0.98 }}
-        >
-          <AnimatePresence mode="wait">
-            {currentNews && (
+        <div className="absolute inset-0 w-full h-full">
+          {/* Previous Card (Bottom Layer) */}
+          {prevNews && (
+            <motion.div
+              className="absolute inset-0 w-full h-full"
+              initial={{ scale: 0.9, opacity: 0.3, y: 0 }}
+              animate={{ scale: 0.9, opacity: 0.3, y: 0 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+              style={{ zIndex: 10 }}
+            >
               <NewsCard
-                key={`${selectedCategory}-${currentIndex}`}
+                key={`prev-${selectedCategory}-${getPrevIndex(animationIndex)}`}
+                newsItem={prevNews}
+                onMarketInteraction={() => {}} // Disable interactions for background cards
+                swipeDirection={undefined}
+                isBackgroundCard={true}
+              />
+            </motion.div>
+          )}
+
+          {/* Next Card (Middle Layer) */}
+          {nextNews && (
+            <motion.div
+              className="absolute inset-0 w-full h-full"
+              initial={{ scale: 0.95, opacity: 0.7, y: 0 }}
+              animate={{ scale: 0.95, opacity: 0.7, y: 0 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+              style={{ zIndex: 20 }}
+            >
+              <NewsCard
+                key={`next-${selectedCategory}-${getNextIndex(animationIndex)}`}
+                newsItem={nextNews}
+                onMarketInteraction={() => {}}
+                swipeDirection={undefined}
+                isBackgroundCard={true}
+              />
+            </motion.div>
+          )}
+
+          {/* Current Card (Top Layer) */}
+          {currentNews && (
+            <motion.div
+              className="absolute inset-0 w-full h-full"
+              drag={!isTransitioning}
+              dragConstraints={{ top: -1000, bottom: 0, left: 0, right: 0 }}
+              dragElastic={0.1}
+              onPanEnd={handlePanEnd}
+              initial={{ y: 0, scale: 1, opacity: 1 }}
+              animate={{ 
+                y: swipeDirection === 'up' ? -1000 : 0,
+                scale: 1, 
+                opacity: swipeDirection === 'up' ? 0 : 1 
+              }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+              whileDrag={{ scale: 1.02, rotate: 2 }}
+              style={{ zIndex: 30 }}
+            >
+              <NewsCard
+                key={`current-${selectedCategory}-${animationIndex}`}
                 newsItem={currentNews}
                 onMarketInteraction={handleMarketInteraction}
                 swipeDirection={swipeDirection}
                 isBackgroundCard={false}
               />
-            )}
-          </AnimatePresence>
-        </motion.div>
+            </motion.div>
+          )}
+        </div>
       </div>
 
       {/* Markets Panel */}

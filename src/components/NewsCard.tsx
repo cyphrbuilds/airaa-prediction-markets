@@ -11,9 +11,10 @@ interface NewsCardProps {
   newsItem: NewsItem;
   onMarketInteraction?: (isInteracting: boolean) => void;
   swipeDirection?: 'up' | 'down' | 'left' | 'right';
+  isBackgroundCard?: boolean;
 }
 
-export default function NewsCard({ newsItem, onMarketInteraction, swipeDirection }: NewsCardProps) {
+export default function NewsCard({ newsItem, onMarketInteraction, swipeDirection, isBackgroundCard }: NewsCardProps) {
   const marketEvents = newsItem.events.slice(0, 2); // Max 2 events
   const [currentMarketIndex, setCurrentMarketIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -191,7 +192,7 @@ export default function NewsCard({ newsItem, onMarketInteraction, swipeDirection
   return (
     <motion.div
       className="w-full h-full px-4 pt-2 pb-4 flex flex-col justify-start items-start gap-4"
-      initial={getInitialAnimation()}
+      initial={isBackgroundCard ? { opacity: 1, x: 0, y: 0 } : getInitialAnimation()}
       animate={{ opacity: 1, x: 0, y: 0 }}
       exit={getExitAnimation()}
       transition={{ duration: 0.3, ease: "easeInOut" }}
