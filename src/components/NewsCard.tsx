@@ -203,7 +203,7 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
                       {event.totalVolume}
                     </span>
                     <span className="text-subtle text-[13px] font-normal leading-none">
-                      Expire on Sep 9, 27
+                      Expire on {event.markets[0]?.expiryDate || 'TBD'}
                     </span>
                   </div>
 
@@ -225,7 +225,9 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
                         style={{ backgroundColor: '#131712' }}
                       >
                         <span className="text-[13px] font-normal" style={{ color: '#35D536' }}>Yes</span>
-                        <span className="text-[13px] font-normal" style={{ color: '#35D536' }}>30¢</span>
+                        <span className="text-[13px] font-normal" style={{ color: '#35D536' }}>
+                          {Math.round((event.markets[0]?.yesPrice || 0) * 100)}¢
+                        </span>
                       </Button>
                       <div className="w-full text-center">
                         <span className="text-subtle text-[13px] font-normal">$100 → </span>
@@ -238,7 +240,9 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
                         style={{ backgroundColor: '#131010' }}
                       >
                         <span className="text-[13px] font-normal" style={{ color: '#F34E4F' }}>No</span>
-                        <span className="text-[13px] font-normal" style={{ color: '#F34E4F' }}>80¢</span>
+                        <span className="text-[13px] font-normal" style={{ color: '#F34E4F' }}>
+                          {Math.round((event.markets[0]?.noPrice || 0) * 100)}¢
+                        </span>
                       </Button>
                       <div className="w-full text-center">
                         <span className="text-subtle text-[13px] font-normal">$40 → </span>
