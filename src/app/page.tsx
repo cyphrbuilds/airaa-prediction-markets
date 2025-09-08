@@ -69,9 +69,12 @@ export default function Home() {
     const threshold = 50;
     const { offset, velocity } = info;
 
-    // Check if the touch started on a market card area (prevent horizontal swipes on market cards)
+    // Check if the touch started on a market card area
     const target = event.target as HTMLElement;
     const isMarketCardArea = target.closest('.market-cards-scroll') || target.closest('.horizontal-scroll');
+    
+    // Check if there are multiple market cards (if only one, allow category changes)
+    const hasMultipleMarkets = currentNews?.events && currentNews.events.length > 1;
     
     // Determine swipe direction based on offset and velocity
     if (Math.abs(offset.y) > Math.abs(offset.x)) {
@@ -82,8 +85,22 @@ export default function Home() {
         handleSwipe('up');
       }
     } else {
-      // Horizontal swipe - only allow if not on market cards AND not currently interacting with markets
-      if (!isMarketCardArea && !isInteractingWithMarkets) {
+      // Horizontal swipe logic
+      if (isMarketCardArea) {
+        // If on market cards area
+        if (hasMultipleMarkets) {
+          // Multiple markets - let market cards handle scrolling, don't change category
+          return;
+        } else {
+          // Single market - allow category change
+          if (offset.x > threshold || velocity.x > 500) {
+            handleSwipe('right'); // Swipe right = move to previous category
+          } else if (offset.x < -threshold || velocity.x < -500) {
+            handleSwipe('left'); // Swipe left = move to next category
+          }
+        }
+      } else {
+        // Not on market cards area - always allow category changes
         if (offset.x > threshold || velocity.x > 500) {
           handleSwipe('right'); // Swipe right = move to previous category
         } else if (offset.x < -threshold || velocity.x < -500) {
@@ -91,7 +108,7 @@ export default function Home() {
         }
       }
     }
-  }, [handleSwipe, isInteractingWithMarkets]);
+  }, [handleSwipe, currentNews]);
 
   const handleCategoryChange = useCallback((category: string) => {
     setSelectedCategory(category);

@@ -30,41 +30,53 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
       setCurrentMarketIndex(Math.min(newIndex, marketEvents.length - 1));
     };
 
-    // Prevent touch events from bubbling up to parent (which would trigger category changes)
+    // Handle touch events - only prevent bubbling if there are multiple markets
+    const hasMultipleMarkets = marketEvents.length > 1;
+    
     const handleTouchStart = (e: TouchEvent) => {
-      e.stopPropagation();
-      isInteractingWithMarkets.current = true;
-      onMarketInteraction?.(true);
+      if (hasMultipleMarkets) {
+        e.stopPropagation();
+        isInteractingWithMarkets.current = true;
+        onMarketInteraction?.(true);
+      }
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      e.stopPropagation();
-      isInteractingWithMarkets.current = true;
-      onMarketInteraction?.(true);
+      if (hasMultipleMarkets) {
+        e.stopPropagation();
+        isInteractingWithMarkets.current = true;
+        onMarketInteraction?.(true);
+      }
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
-      e.stopPropagation();
-      // Reset after a short delay to allow for any pending events
-      setTimeout(() => {
-        isInteractingWithMarkets.current = false;
-        onMarketInteraction?.(false);
-      }, 100);
+      if (hasMultipleMarkets) {
+        e.stopPropagation();
+        // Reset after a short delay to allow for any pending events
+        setTimeout(() => {
+          isInteractingWithMarkets.current = false;
+          onMarketInteraction?.(false);
+        }, 100);
+      }
     };
 
-    // Mouse events for desktop/tablet
+    // Mouse events for desktop/tablet - only prevent bubbling if there are multiple markets
     const handleMouseDown = (e: MouseEvent) => {
-      e.stopPropagation();
-      isInteractingWithMarkets.current = true;
-      onMarketInteraction?.(true);
+      if (hasMultipleMarkets) {
+        e.stopPropagation();
+        isInteractingWithMarkets.current = true;
+        onMarketInteraction?.(true);
+      }
     };
 
     const handleMouseUp = (e: MouseEvent) => {
-      e.stopPropagation();
-      setTimeout(() => {
-        isInteractingWithMarkets.current = false;
-        onMarketInteraction?.(false);
-      }, 100);
+      if (hasMultipleMarkets) {
+        e.stopPropagation();
+        setTimeout(() => {
+          isInteractingWithMarkets.current = false;
+          onMarketInteraction?.(false);
+        }, 100);
+      }
     };
 
     container.addEventListener('scroll', handleScroll);
