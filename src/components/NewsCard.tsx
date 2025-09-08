@@ -28,6 +28,9 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
       const containerWidth = container.clientWidth;
       const newIndex = Math.round(scrollLeft / containerWidth);
       setCurrentMarketIndex(Math.min(newIndex, marketEvents.length - 1));
+      
+      // Debug logging
+      console.log('Market scroll:', { scrollLeft, containerWidth, newIndex, marketEventsLength: marketEvents.length });
     };
 
     // Handle touch events - only prevent bubbling if there are multiple markets
@@ -35,6 +38,7 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
     
     const handleTouchStart = (e: TouchEvent) => {
       if (hasMultipleMarkets) {
+        // Don't prevent default - let the browser handle scrolling
         e.stopPropagation();
         isInteractingWithMarkets.current = true;
         onMarketInteraction?.(true);
@@ -43,6 +47,7 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
 
     const handleTouchMove = (e: TouchEvent) => {
       if (hasMultipleMarkets) {
+        // Don't prevent default - let the browser handle scrolling
         e.stopPropagation();
         isInteractingWithMarkets.current = true;
         onMarketInteraction?.(true);
@@ -86,6 +91,15 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
     container.addEventListener('mousedown', handleMouseDown);
     container.addEventListener('mouseup', handleMouseUp);
     
+    // Add wheel event for desktop scrolling
+    const handleWheel = (e: WheelEvent) => {
+      if (hasMultipleMarkets) {
+        e.preventDefault();
+        container.scrollLeft += e.deltaY;
+      }
+    };
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    
     return () => {
       container.removeEventListener('scroll', handleScroll);
       container.removeEventListener('touchstart', handleTouchStart);
@@ -93,6 +107,7 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
       container.removeEventListener('touchend', handleTouchEnd);
       container.removeEventListener('mousedown', handleMouseDown);
       container.removeEventListener('mouseup', handleMouseUp);
+      container.removeEventListener('wheel', handleWheel);
     };
   }, [marketEvents.length]);
 
@@ -162,7 +177,11 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
           </div>
 
           {/* Market Cards with Horizontal Scroll */}
-          <div ref={scrollContainerRef} className="w-full flex-1 overflow-x-auto horizontal-scroll market-cards-scroll">
+          <div 
+            ref={scrollContainerRef} 
+            className="w-full flex-1 overflow-x-auto horizontal-scroll market-cards-scroll"
+            style={{ touchAction: 'pan-x' }}
+          >
             <div className="flex gap-2 px-3 pb-3">
               {/* Market Cards */}
               {marketEvents.map((event, index) => (
