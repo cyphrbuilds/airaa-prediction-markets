@@ -137,6 +137,14 @@ body {
   body {
     position: relative;
     overflow: hidden;
+    /* Add bottom padding to account for mobile browser UI */
+    padding-bottom: env(safe-area-inset-bottom, 1rem);
+  }
+  
+  /* Ensure content doesn't get hidden behind browser UI */
+  .mobile-container {
+    min-height: calc(100vh - env(safe-area-inset-bottom, 1rem));
+    min-height: calc(-webkit-fill-available - env(safe-area-inset-bottom, 1rem));
   }
 }
 
@@ -156,11 +164,28 @@ html {
   height: -webkit-fill-available;
   overflow: hidden;
   background-color: var(--color-background);
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
+  padding-bottom: max(env(safe-area-inset-bottom), 1rem);
 }
 
 /* Safe area handling for mobile devices */
 .safe-area-inset-bottom {
   padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+/* Optional: Hide browser UI (use with caution) */
+.hide-browser-ui {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Additional mobile bottom spacing for better UX */
+.mobile-bottom-spacing {
+  padding-bottom: 2rem;
 }
 
 /* New Design System Classes */
@@ -205,10 +230,31 @@ html {
 .horizontal-scroll {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .horizontal-scroll::-webkit-scrollbar {
   display: none;
+}
+
+/* Enhanced smooth scrolling for market cards */
+.market-cards-scroll {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+}
+
+.market-cards-scroll > * {
+  scroll-snap-align: start;
+}
+
+/* Market card width optimization */
+.market-card {
+  width: 85vw;
+  max-width: calc(100vw - 4rem);
+  min-width: 280px;
 }
 
 /* Animation classes */

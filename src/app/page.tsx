@@ -37,31 +37,27 @@ export default function Home() {
     setSwipeDirection(direction);
 
     if (direction === 'up') {
-      // Next story
-      if (currentIndex < filteredNews.length - 1) {
-        setCurrentIndex(currentIndex + 1);
-      }
+      // Next story - infinite scroll
+      const nextIndex = currentIndex < filteredNews.length - 1 ? currentIndex + 1 : 0;
+      setCurrentIndex(nextIndex);
     } else if (direction === 'down') {
-      // Previous story
-      if (currentIndex > 0) {
-        setCurrentIndex(currentIndex - 1);
-      }
+      // Previous story - infinite scroll
+      const prevIndex = currentIndex > 0 ? currentIndex - 1 : filteredNews.length - 1;
+      setCurrentIndex(prevIndex);
     } else if (direction === 'left') {
-      // Swipe left = move to next category (tabs move right)
+      // Swipe left = move to next category (tabs move right) - infinite scroll
       const currentCategoryIndex = categories.indexOf(selectedCategory);
-      if (currentCategoryIndex < categories.length - 1) {
-        const nextCategory = categories[currentCategoryIndex + 1];
-        setSelectedCategory(nextCategory);
-        setCurrentIndex(0);
-      }
+      const nextIndex = currentCategoryIndex < categories.length - 1 ? currentCategoryIndex + 1 : 0;
+      const nextCategory = categories[nextIndex];
+      setSelectedCategory(nextCategory);
+      setCurrentIndex(0);
     } else if (direction === 'right') {
-      // Swipe right = move to previous category (tabs move left)
+      // Swipe right = move to previous category (tabs move left) - infinite scroll
       const currentCategoryIndex = categories.indexOf(selectedCategory);
-      if (currentCategoryIndex > 0) {
-        const prevCategory = categories[currentCategoryIndex - 1];
-        setSelectedCategory(prevCategory);
-        setCurrentIndex(0);
-      }
+      const prevIndex = currentCategoryIndex > 0 ? currentCategoryIndex - 1 : categories.length - 1;
+      const prevCategory = categories[prevIndex];
+      setSelectedCategory(prevCategory);
+      setCurrentIndex(0);
     }
 
     // Reset swipe direction after animation
@@ -72,20 +68,26 @@ export default function Home() {
     const threshold = 50;
     const { offset, velocity } = info;
 
+    // Check if the touch started on a market card area (prevent horizontal swipes on market cards)
+    const target = event.target as HTMLElement;
+    const isMarketCardArea = target.closest('.market-cards-scroll') || target.closest('.horizontal-scroll');
+    
     // Determine swipe direction based on offset and velocity
     if (Math.abs(offset.y) > Math.abs(offset.x)) {
-      // Vertical swipe
+      // Vertical swipe - always allow
       if (offset.y > threshold || velocity.y > 500) {
         handleSwipe('down');
       } else if (offset.y < -threshold || velocity.y < -500) {
         handleSwipe('up');
       }
     } else {
-      // Horizontal swipe
-      if (offset.x > threshold || velocity.x > 500) {
-        handleSwipe('right'); // Swipe right = move to previous category
-      } else if (offset.x < -threshold || velocity.x < -500) {
-        handleSwipe('left'); // Swipe left = move to next category
+      // Horizontal swipe - only allow if not on market cards
+      if (!isMarketCardArea) {
+        if (offset.x > threshold || velocity.x > 500) {
+          handleSwipe('right'); // Swipe right = move to previous category
+        } else if (offset.x < -threshold || velocity.x < -500) {
+          handleSwipe('left'); // Swipe left = move to next category
+        }
       }
     }
   }, [handleSwipe]);

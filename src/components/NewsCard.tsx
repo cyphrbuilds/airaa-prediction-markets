@@ -28,8 +28,30 @@ export default function NewsCard({ newsItem }: NewsCardProps) {
       setCurrentMarketIndex(Math.min(newIndex, marketEvents.length - 1));
     };
 
+    // Prevent touch events from bubbling up to parent (which would trigger category changes)
+    const handleTouchStart = (e: TouchEvent) => {
+      e.stopPropagation();
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      e.stopPropagation();
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      e.stopPropagation();
+    };
+
     container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
+    container.addEventListener('touchstart', handleTouchStart, { passive: true });
+    container.addEventListener('touchmove', handleTouchMove, { passive: true });
+    container.addEventListener('touchend', handleTouchEnd, { passive: true });
+    
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+      container.removeEventListener('touchend', handleTouchEnd);
+    };
   }, [marketEvents.length]);
 
   return (
@@ -98,13 +120,13 @@ export default function NewsCard({ newsItem }: NewsCardProps) {
           </div>
 
           {/* Market Cards with Horizontal Scroll */}
-          <div ref={scrollContainerRef} className="w-full flex-1 overflow-x-auto horizontal-scroll">
+          <div ref={scrollContainerRef} className="w-full flex-1 overflow-x-auto horizontal-scroll market-cards-scroll">
             <div className="flex gap-2 px-3 pb-3">
               {/* Market Cards */}
               {marketEvents.map((event, index) => (
                 <div
                   key={event.id}
-                  className="w-[90vw] flex-shrink-0 px-3 py-3.5 gradient-card rounded-[10px] border border-border flex flex-col justify-start items-start gap-3.5"
+                  className="market-card flex-shrink-0 px-3 py-3.5 gradient-card rounded-[10px] border border-border flex flex-col justify-start items-start gap-3.5 scroll-snap-align-start"
                 >
                   {/* Volume and Expiry */}
                   <div className="w-full flex justify-between items-center">
