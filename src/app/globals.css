@@ -276,6 +276,44 @@ html {
   min-width: 280px;
 }
 
+/* Sentiment Tag Colors */
+.sentiment-bullish {
+  background-color: #131712;
+  border-color: #203320;
+  color: #131712;
+}
+
+.sentiment-bearish {
+  background-color: #131010;
+  border-color: #471717;
+  color: #F34E4F;
+}
+
+.sentiment-neutral {
+  background-color: #1C1500;
+  border-color: #5A3F00;
+  color: #FFB914;
+}
+
+/* Impact Tag Colors */
+.impact-high {
+  background-color: #000515;
+  border-color: #011141;
+  color: #0B48FB;
+}
+
+.impact-medium {
+  background-color: #1E012B;
+  border-color: #480065;
+  color: #C347FF;
+}
+
+.impact-low {
+  background-color: #121212;
+  border-color: #555555;
+  color: #FFFFFF;
+}
+
 /* Animation classes */
 .fade-in {
   animation: fadeIn 0.3s ease-in-out;

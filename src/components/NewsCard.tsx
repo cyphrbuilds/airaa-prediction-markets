@@ -136,11 +136,19 @@ export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProp
           {/* Category and Time */}
           <div className="w-full flex justify-between items-center">
             <div className="flex justify-start items-start gap-2">
-              <Badge className="h-7 px-2 py-1 bg-surface-secondary border border-border-secondary text-white text-sm font-normal">
-                {newsItem.category}
+              <Badge className={`h-7 px-2 py-1 text-sm font-normal border ${
+                newsItem.sentiment === 'Bullish' ? 'sentiment-bullish' :
+                newsItem.sentiment === 'Bearish' ? 'sentiment-bearish' :
+                'sentiment-neutral'
+              }`}>
+                {newsItem.sentiment}
               </Badge>
-              <Badge className="h-7 px-2 py-1 bg-surface-secondary border border-border-secondary text-white text-sm font-normal">
-                Finance
+              <Badge className={`h-7 px-2 py-1 text-sm font-normal border ${
+                newsItem.impact === 'High Impact' ? 'impact-high' :
+                newsItem.impact === 'Medium Impact' ? 'impact-medium' :
+                'impact-low'
+              }`}>
+                {newsItem.impact}
               </Badge>
             </div>
             <div className="flex justify-center items-center gap-1">

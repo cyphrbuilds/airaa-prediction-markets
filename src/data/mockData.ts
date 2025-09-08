@@ -1,6 +1,7 @@
 export enum Sentiment {
   BULLISH = 'Bullish',
-  BEARISH = 'Bearish'
+  BEARISH = 'Bearish',
+  NEUTRAL = 'Neutral'
 }
 
 export enum Impact {
@@ -126,8 +127,8 @@ export const mockNewsData: NewsItem[] = [
     time: '4 hours ago',
     thumbnail: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=600&fit=crop&q=80',
     category: 'Business',
-    sentiment: Sentiment.BULLISH,
-    impact: Impact.HIGH,
+    sentiment: Sentiment.BEARISH,
+    impact: Impact.MEDIUM,
     events: [
       {
         id: 'event_3',
@@ -159,8 +160,8 @@ export const mockNewsData: NewsItem[] = [
     summary: 'Researchers develop advanced AI system capable of complex problem-solving, raising questions about artificial general intelligence timeline.',
     source: 'MIT Technology Review',
     time: '6 hours ago',
-    sentiment: Sentiment.BULLISH,
-    impact: Impact.HIGH,
+    sentiment: Sentiment.NEUTRAL,
+    impact: Impact.LOW,
     thumbnail: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop&q=80',
     category: 'Technology',
     events: [
