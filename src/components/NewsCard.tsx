@@ -364,24 +364,21 @@ export default function NewsCard({ newsItem, onMarketInteraction, swipeDirection
       {/* Last News Indicator */}
       {isLastNews && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
+          exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="w-full flex flex-col items-center justify-center gap-4 py-6"
+          className="w-full flex flex-col items-center justify-center gap-2 py-3"
         >
-          <div className="text-center">
-            <h3 className="text-white text-lg font-medium mb-2">You&apos;ve reached the end!</h3>
-            <p className="text-muted text-sm">This was the latest news in this category.</p>
-          </div>
+          <p className="text-muted text-sm">You have reached the end!</p>
           
           <motion.button
             onClick={onScrollToTop}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-primary-green text-black rounded-full font-medium hover:bg-primary-green/90 transition-colors"
+            className="flex items-center justify-center gap-1 px-3 py-1.5 bg-white text-black rounded-full text-xs font-medium hover:bg-gray-100 transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <ChevronUp className="w-5 h-5" />
+            <ChevronUp className="w-3 h-3" />
             <span>Back to Latest</span>
           </motion.button>
         </motion.div>
