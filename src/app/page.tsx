@@ -38,9 +38,12 @@ export default function Home() {
     setSwipeDirection(direction);
 
     if (direction === 'up') {
-      // Next story - infinite scroll
-      const nextIndex = currentIndex < filteredNews.length - 1 ? currentIndex + 1 : 0;
-      setCurrentIndex(nextIndex);
+      // Next story - check if we're at the last item
+      if (currentIndex < filteredNews.length - 1) {
+        const nextIndex = currentIndex + 1;
+        setCurrentIndex(nextIndex);
+      }
+      // If at last item, don't do anything (will show last news indicator)
     } else if (direction === 'down') {
       // Previous story - infinite scroll
       const prevIndex = currentIndex > 0 ? currentIndex - 1 : filteredNews.length - 1;
@@ -115,6 +118,10 @@ export default function Home() {
     setIsInteractingWithMarkets(isInteracting);
   }, []);
 
+  const handleScrollToTop = useCallback(() => {
+    setCurrentIndex(0);
+  }, []);
+
   // Check if device is mobile
   useEffect(() => {
     const checkMobile = () => {
@@ -161,6 +168,8 @@ export default function Home() {
                 onMarketInteraction={handleMarketInteraction}
                 swipeDirection={swipeDirection}
                 isBackgroundCard={false}
+                isLastNews={currentIndex === filteredNews.length - 1}
+                onScrollToTop={handleScrollToTop}
               />
             )}
           </AnimatePresence>

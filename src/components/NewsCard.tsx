@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 import { NewsItem } from '@/data/mockData';
-import { TrendingUp, Clock } from 'lucide-react';
+import { TrendingUp, Clock, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
@@ -12,9 +12,11 @@ interface NewsCardProps {
   onMarketInteraction?: (isInteracting: boolean) => void;
   swipeDirection?: 'up' | 'down' | 'left' | 'right';
   isBackgroundCard?: boolean;
+  isLastNews?: boolean;
+  onScrollToTop?: () => void;
 }
 
-export default function NewsCard({ newsItem, onMarketInteraction, swipeDirection, isBackgroundCard }: NewsCardProps) {
+export default function NewsCard({ newsItem, onMarketInteraction, swipeDirection, isBackgroundCard, isLastNews, onScrollToTop }: NewsCardProps) {
   const marketEvents = newsItem.events.slice(0, 2); // Max 2 events
   const [currentMarketIndex, setCurrentMarketIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -359,6 +361,31 @@ export default function NewsCard({ newsItem, onMarketInteraction, swipeDirection
         </div>
       </div>
 
+      {/* Last News Indicator */}
+      {isLastNews && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="w-full flex flex-col items-center justify-center gap-4 py-6"
+        >
+          <div className="text-center">
+            <h3 className="text-white text-lg font-medium mb-2">You&apos;ve reached the end!</h3>
+            <p className="text-muted text-sm">This was the latest news in this category.</p>
+          </div>
+          
+          <motion.button
+            onClick={onScrollToTop}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-primary-green text-black rounded-full font-medium hover:bg-primary-green/90 transition-colors"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <ChevronUp className="w-5 h-5" />
+            <span>Back to Latest</span>
+          </motion.button>
+        </motion.div>
+      )}
 
     </motion.div>
   );
