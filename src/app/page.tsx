@@ -7,14 +7,12 @@ import Header from '@/components/Header';
 import NewsCard from '@/components/NewsCard';
 import MarketsPanel from '@/components/MarketsPanel';
 import CategoryFilter from '@/components/CategoryFilter';
-import SwipeHint from '@/components/SwipeHint';
 import DesktopWarning from '@/components/DesktopWarning';
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMarketsOpen, setIsMarketsOpen] = useState(false);
-  const [showSwipeHint, setShowSwipeHint] = useState(true);
   const [swipeDirection, setSwipeDirection] = useState<'up' | 'down' | 'left' | 'right' | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobile, setIsMobile] = useState(false);
@@ -37,7 +35,6 @@ export default function Home() {
     lastSwipeTime.current = now;
 
     setSwipeDirection(direction);
-    setShowSwipeHint(false);
 
     if (direction === 'up') {
       // Next story
@@ -96,7 +93,6 @@ export default function Home() {
   const handleCategoryChange = useCallback((category: string) => {
     setSelectedCategory(category);
     setCurrentIndex(0); // Reset to first item when changing category
-    setShowSwipeHint(true); // Show hint again when changing categories
   }, []);
 
   const handleSearch = useCallback((query: string) => {
@@ -120,14 +116,6 @@ export default function Home() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Hide swipe hint after first interaction
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSwipeHint(false);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   // Show desktop warning on desktop
   if (!isMobile) {
@@ -135,7 +123,7 @@ export default function Home() {
   }
 
   return (
-    <div className="mobile-container bg-background">
+    <div className="mobile-container bg-background flex flex-col">
       {/* Header */}
       <Header />
 
@@ -153,7 +141,7 @@ export default function Home() {
           dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
           dragElastic={0.2}
           onPanEnd={handlePanEnd}
-          className="w-full h-full"
+          className="w-full h-full flex flex-col"
           whileDrag={{ scale: 0.98 }}
         >
           <AnimatePresence mode="wait">
@@ -174,11 +162,6 @@ export default function Home() {
         events={currentNews?.events || []}
       />
 
-      {/* Swipe Hint */}
-      <SwipeHint 
-        show={showSwipeHint && currentIndex === 0} 
-        direction={swipeDirection}
-      />
     </div>
   );
 }
