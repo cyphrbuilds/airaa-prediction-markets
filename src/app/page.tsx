@@ -16,6 +16,7 @@ export default function Home() {
   const [swipeDirection, setSwipeDirection] = useState<'up' | 'down' | 'left' | 'right' | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobile, setIsMobile] = useState(false);
+  const [isInteractingWithMarkets, setIsInteractingWithMarkets] = useState(false);
   const lastSwipeTime = useRef(0);
 
   // Filter news based on selected category and search query
@@ -81,8 +82,8 @@ export default function Home() {
         handleSwipe('up');
       }
     } else {
-      // Horizontal swipe - only allow if not on market cards
-      if (!isMarketCardArea) {
+      // Horizontal swipe - only allow if not on market cards AND not currently interacting with markets
+      if (!isMarketCardArea && !isInteractingWithMarkets) {
         if (offset.x > threshold || velocity.x > 500) {
           handleSwipe('right'); // Swipe right = move to previous category
         } else if (offset.x < -threshold || velocity.x < -500) {
@@ -90,7 +91,7 @@ export default function Home() {
         }
       }
     }
-  }, [handleSwipe]);
+  }, [handleSwipe, isInteractingWithMarkets]);
 
   const handleCategoryChange = useCallback((category: string) => {
     setSelectedCategory(category);
@@ -105,6 +106,10 @@ export default function Home() {
 
   const handleMarketsClose = useCallback(() => {
     setIsMarketsOpen(false);
+  }, []);
+
+  const handleMarketInteraction = useCallback((isInteracting: boolean) => {
+    setIsInteractingWithMarkets(isInteracting);
   }, []);
 
   // Check if device is mobile
@@ -151,6 +156,7 @@ export default function Home() {
               <NewsCard
                 key={`${selectedCategory}-${currentIndex}`}
                 newsItem={currentNews}
+                onMarketInteraction={handleMarketInteraction}
               />
             )}
           </AnimatePresence>

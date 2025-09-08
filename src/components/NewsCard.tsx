@@ -9,12 +9,14 @@ import { Badge } from '@/components/ui/badge';
 
 interface NewsCardProps {
   newsItem: NewsItem;
+  onMarketInteraction?: (isInteracting: boolean) => void;
 }
 
-export default function NewsCard({ newsItem }: NewsCardProps) {
+export default function NewsCard({ newsItem, onMarketInteraction }: NewsCardProps) {
   const marketEvents = newsItem.events.slice(0, 2); // Max 2 events
   const [currentMarketIndex, setCurrentMarketIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isInteractingWithMarkets = useRef(false);
 
   // Handle scroll events to update current market index
   useEffect(() => {
@@ -31,26 +33,54 @@ export default function NewsCard({ newsItem }: NewsCardProps) {
     // Prevent touch events from bubbling up to parent (which would trigger category changes)
     const handleTouchStart = (e: TouchEvent) => {
       e.stopPropagation();
+      isInteractingWithMarkets.current = true;
+      onMarketInteraction?.(true);
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       e.stopPropagation();
+      isInteractingWithMarkets.current = true;
+      onMarketInteraction?.(true);
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
       e.stopPropagation();
+      // Reset after a short delay to allow for any pending events
+      setTimeout(() => {
+        isInteractingWithMarkets.current = false;
+        onMarketInteraction?.(false);
+      }, 100);
+    };
+
+    // Mouse events for desktop/tablet
+    const handleMouseDown = (e: MouseEvent) => {
+      e.stopPropagation();
+      isInteractingWithMarkets.current = true;
+      onMarketInteraction?.(true);
+    };
+
+    const handleMouseUp = (e: MouseEvent) => {
+      e.stopPropagation();
+      setTimeout(() => {
+        isInteractingWithMarkets.current = false;
+        onMarketInteraction?.(false);
+      }, 100);
     };
 
     container.addEventListener('scroll', handleScroll);
     container.addEventListener('touchstart', handleTouchStart, { passive: true });
     container.addEventListener('touchmove', handleTouchMove, { passive: true });
     container.addEventListener('touchend', handleTouchEnd, { passive: true });
+    container.addEventListener('mousedown', handleMouseDown);
+    container.addEventListener('mouseup', handleMouseUp);
     
     return () => {
       container.removeEventListener('scroll', handleScroll);
       container.removeEventListener('touchstart', handleTouchStart);
       container.removeEventListener('touchmove', handleTouchMove);
       container.removeEventListener('touchend', handleTouchEnd);
+      container.removeEventListener('mousedown', handleMouseDown);
+      container.removeEventListener('mouseup', handleMouseUp);
     };
   }, [marketEvents.length]);
 
