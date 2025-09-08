@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { mockNewsData, categories } from '@/data/mockData';
+import Header from '@/components/Header';
 import NewsCard from '@/components/NewsCard';
 import MarketsPanel from '@/components/MarketsPanel';
 import CategoryFilter from '@/components/CategoryFilter';
@@ -22,10 +23,9 @@ export default function Home() {
   // Filter news based on selected category and search query
   const filteredNews = mockNewsData.filter(item => {
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
-    const matchesSearch = !searchQuery || 
+    const matchesSearch = searchQuery === '' || 
       item.headline.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.source.toLowerCase().includes(searchQuery.toLowerCase());
+      item.summary.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -99,84 +99,46 @@ export default function Home() {
     setShowSwipeHint(true); // Show hint again when changing categories
   }, []);
 
-
-  const handleMarketsClick = useCallback(() => {
-    setIsMarketsOpen(true);
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+    setCurrentIndex(0); // Reset to first item when searching
   }, []);
+
 
   const handleMarketsClose = useCallback(() => {
     setIsMarketsOpen(false);
   }, []);
 
-  const handleSearch = useCallback((query: string) => {
-    setSearchQuery(query);
-    setCurrentIndex(0); // Reset to first item when searching
-    setShowSwipeHint(true);
-  }, []);
-
   // Check if device is mobile
   useEffect(() => {
     const checkMobile = () => {
-      const isMobileDevice = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      setIsMobile(isMobileDevice);
+      setIsMobile(window.innerWidth <= 768);
     };
-
+    
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Keyboard navigation
+  // Hide swipe hint after first interaction
   useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowUp' || e.key === 'ArrowRight') {
-        handleSwipe('up');
-      } else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') {
-        handleSwipe('down');
-      } else if (e.key === 'Escape') {
-        setIsMarketsOpen(false);
-        setSearchQuery('');
-      }
-    };
+    const timer = setTimeout(() => {
+      setShowSwipeHint(false);
+    }, 3000);
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [handleSwipe]);
+    return () => clearTimeout(timer);
+  }, []);
 
-  // Show desktop warning if not mobile
+  // Show desktop warning on desktop
   if (!isMobile) {
     return <DesktopWarning />;
   }
 
-  if (!currentNews) {
-    return (
-      <div className="mobile-container bg-background">
-        <CategoryFilter
-          selectedCategory={selectedCategory}
-          onCategoryChange={handleCategoryChange}
-          onSearch={handleSearch}
-        />
-        <div className="flex items-center justify-center h-full">
-          <div className="text-center">
-            <p className="text-muted-foreground text-lg mb-2">
-              {searchQuery ? 'No results found' : 'No news available for this category'}
-            </p>
-            {searchQuery && (
-              <button
-                onClick={() => handleSearch('')}
-                className="text-primary hover:text-primary/80 text-sm"
-              >
-                Clear search
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="mobile-container bg-background">
+      {/* Header */}
+      <Header />
+
       {/* Category Filter */}
       <CategoryFilter
         selectedCategory={selectedCategory}
@@ -185,21 +147,22 @@ export default function Home() {
       />
 
       {/* News Card Container */}
-      <div className="relative">
+      <div className="relative flex-1 overflow-hidden">
         <motion.div
           drag
           dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
           dragElastic={0.2}
           onPanEnd={handlePanEnd}
-          className="w-full"
+          className="w-full h-full"
           whileDrag={{ scale: 0.98 }}
         >
           <AnimatePresence mode="wait">
-            <NewsCard
-              key={`${selectedCategory}-${currentIndex}`}
-              newsItem={currentNews}
-              onMarketsClick={handleMarketsClick}
-            />
+            {currentNews && (
+              <NewsCard
+                key={`${selectedCategory}-${currentIndex}`}
+                newsItem={currentNews}
+              />
+            )}
           </AnimatePresence>
         </motion.div>
       </div>
@@ -208,7 +171,7 @@ export default function Home() {
       <MarketsPanel
         isOpen={isMarketsOpen}
         onClose={handleMarketsClose}
-        events={currentNews.events}
+        events={currentNews?.events || []}
       />
 
       {/* Swipe Hint */}
@@ -216,7 +179,6 @@ export default function Home() {
         show={showSwipeHint && currentIndex === 0} 
         direction={swipeDirection}
       />
-
     </div>
   );
 }
