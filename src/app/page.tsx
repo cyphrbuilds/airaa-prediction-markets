@@ -16,7 +16,6 @@ export default function Home() {
   const [swipeDirection, setSwipeDirection] = useState<'up' | 'down' | 'left' | 'right' | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobile, setIsMobile] = useState(false);
-  const [isInteractingWithMarkets, setIsInteractingWithMarkets] = useState(false);
   const lastSwipeTime = useRef(0);
 
   // Filter news based on selected category and search query
@@ -98,7 +97,7 @@ export default function Home() {
         }
       }
     }
-  }, [handleSwipe, currentNews]);
+  }, [handleSwipe]);
 
   const handleCategoryChange = useCallback((category: string) => {
     setSelectedCategory(category);
@@ -114,9 +113,6 @@ export default function Home() {
     setIsMarketsOpen(false);
   }, []);
 
-  const handleMarketInteraction = useCallback((isInteracting: boolean) => {
-    setIsInteractingWithMarkets(isInteracting);
-  }, []);
 
   const handleScrollToTop = useCallback(() => {
     setCurrentIndex(0);
@@ -165,7 +161,6 @@ export default function Home() {
               <NewsCard
                 key={`${selectedCategory}-${currentIndex}`}
                 newsItem={currentNews}
-                onMarketInteraction={handleMarketInteraction}
                 swipeDirection={swipeDirection}
                 isBackgroundCard={false}
                 isLastNews={currentIndex === filteredNews.length - 1}

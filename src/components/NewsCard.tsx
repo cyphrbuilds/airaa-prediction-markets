@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
+import { motion, PanInfo } from 'framer-motion';
+import Image from 'next/image';
 import { NewsItem } from '@/data/mockData';
 import { TrendingUp, Clock, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -21,7 +22,6 @@ export default function NewsCard({ newsItem, onMarketInteraction, swipeDirection
   const [currentMarketIndex, setCurrentMarketIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isInteractingWithMarkets = useRef(false);
-  const [isDragging, setIsDragging] = useState(false);
 
   // Handle scroll events to update current market index
   useEffect(() => {
@@ -34,8 +34,6 @@ export default function NewsCard({ newsItem, onMarketInteraction, swipeDirection
       const newIndex = Math.round(scrollLeft / containerWidth);
       setCurrentMarketIndex(Math.min(newIndex, marketEvents.length - 1));
       
-      // Debug logging
-      console.log('Market scroll:', { scrollLeft, containerWidth, newIndex, marketEventsLength: marketEvents.length });
     };
 
     // Handle touch events - only prevent bubbling if there are multiple markets
@@ -50,7 +48,7 @@ export default function NewsCard({ newsItem, onMarketInteraction, swipeDirection
       }
     };
 
-    const handleTouchMove = (e: TouchEvent) => {
+    const handleTouchMove = () => {
       if (hasMultipleMarkets) {
         // Don't prevent default - let the browser handle scrolling
         // e.stopPropagation(); // Removed to allow native mobile scrolling
@@ -114,10 +112,10 @@ export default function NewsCard({ newsItem, onMarketInteraction, swipeDirection
       container.removeEventListener('mouseup', handleMouseUp);
       container.removeEventListener('wheel', handleWheel);
     };
-  }, [marketEvents.length]);
+  }, [marketEvents.length, onMarketInteraction]);
 
   // Handle market card swipe animations
-  const handleMarketCardPan = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+  const handleMarketCardPan = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const { offset, velocity } = info;
     const threshold = 50;
     
@@ -203,10 +201,13 @@ export default function NewsCard({ newsItem, onMarketInteraction, swipeDirection
       <div className="w-full flex-1 bg-surface rounded-xl border border-border flex flex-col justify-start items-start overflow-hidden card-hover">
         {/* Image Section */}
         <div className="w-full h-[180px] relative overflow-hidden">
-          <img
+          <Image
             src={newsItem.thumbnail}
             alt={newsItem.headline}
+            width={400}
+            height={180}
             className="w-full h-full object-cover"
+            priority={false}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         </div>
@@ -290,8 +291,6 @@ export default function NewsCard({ newsItem, onMarketInteraction, swipeDirection
                   dragConstraints={{ left: 0, right: 0 }}
                   dragElastic={0.2}
                   onPan={handleMarketCardPan}
-                  onDragStart={() => setIsDragging(true)}
-                  onDragEnd={() => setIsDragging(false)}
                   whileDrag={{ 
                     scale: 1.02,
                     rotate: currentMarketIndex === index ? 0 : 2
